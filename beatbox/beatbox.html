@@ -37,6 +37,16 @@
         height:600px;
         float:left;
     }
+    #click{
+        width:130px;
+        height:600px;
+        float:left;
+    }
+    #combo0{
+        width:130px;
+        height:600px;
+        float:left;
+    }
     input.volume {
         width:120px;
         height:10px;
@@ -47,6 +57,7 @@
 
 <h1> Homework#1: Beatbox </h1>
 <br>
+
 <div id = "kick" align = "center">
     <button id="kickPad" onmousedown="playdrum(0)" > Kick ('a' key)</button>
     <p id="kickVolLabel"></p>
@@ -62,14 +73,30 @@
     <p id="hihatVolLabel"></p>
     <input class="volume" onchange="changegain(2,this.value)" id="hihatVol" title="Hihat volume" type="range" min="-24" max ="0" value = "-12">
 </div>
+<div id = "click" align = "center">
+    <button id="clickPad" onmousedown="playdrum(3)"> Click ('c' key)</button>
+    <p id="clickVolLabel"></p>
+    <input class="volume" onchange="changegain(3,this.value)" id="clickVol" title="Click volume" type="range" min="-24" max ="0" value = "-12">
+</div>
+
+<div id = "combo0" align = "center">
+    <button id="combo0Pad" onmousedown="playcombo(0)"> Combo ('q' key)</button>
+    <p></p>
+    <input type="checkbox" name="kick" id="combo0_0"> <label>Kick</label>
+    <input type="checkbox" name="snare" id="combo0_1"> <label>Snare</label>
+    <input type="checkbox" name="hihat" id="combo0_2"> <label>Hihat</label>
+    <input type="checkbox" name="click" id="combo0_3"> <label>Click</label>
+</div>
 
 <script>
+	var beatBoxSoundsNumber = 4
+	var comboBoxes = 1;
     var context = new (window.AudioContext || window.webkitAudioContext)();
-    var buffers = new Array(3); // 0 : kick, 1 : snare, 2 : hihat
-    var volume_id = new Array("kickVol","snareVol","hihatVol");
-    var volume_label_id = new Array("kickVolLabel","snareVolLabel","hihatVolLabel");
-    var gain_nodes = new Array(3);
-    for (i  = 0; i < 3; i++) {
+    var buffers = new Array(beatBoxSoundsNumber); // 0 : kick, 1 : snare, 2 : hihat, 3 : click
+    var volume_id = new Array("kickVol","snareVol","hihatVol", "clickVol");
+    var volume_label_id = new Array("kickVolLabel","snareVolLabel","hihatVolLabel","clickVolLabel");
+    var gain_nodes = new Array(beatBoxSoundsNumber);
+    for (i  = 0; i < beatBoxSoundsNumber; i++) {
         gain_nodes[i] = context.createGain();
         var vol = document.getElementById(volume_id[i]).value;
         gain_nodes[i].gain.value = db2gain(vol);
@@ -96,6 +123,14 @@
         context.decodeAudioData(hihat.response, function(buffer){buffers[2] = buffer;});
     }
     hihat.send();
+	var click = new XMLHttpRequest();
+    click.open("Get","click.wav",true);
+    click.responseType = "arraybuffer";
+    click.onload = function(){
+        context.decodeAudioData(click.response, function(buffer){buffers[3] = buffer;});
+    }
+    click.send();
+
     window.onload=function(){
         window.addEventListener('keydown', function (key) {
             keyboardDown(key);
@@ -110,6 +145,18 @@
         source.connect(gain_nodes[i]).connect(context.destination) 
         source.start()
     }
+
+    function playcombo(x) {
+    	for(i = 0; i < beatBoxSoundsNumber; ++i){
+	        if (document.getElementById("combo"+x+"_"+i).checked){
+	        	var source = context.createBufferSource()
+		        source.buffer = buffers[i]
+		        source.connect(gain_nodes[i]).connect(context.destination) 
+		        source.start()
+    		}
+    	}
+    }
+
     function changegain(i,changedvalue){
         gain_nodes[i].gain.value = db2gain(changedvalue);
         document.getElementById(volume_label_id[i]).innerHTML = 'Volume:  ' + changedvalue + 'dB'; 
@@ -138,6 +185,16 @@
                 hihatpad.className = 'active';
                 simulateClick(hihatpad);
                 break;
+            case 67: //'c'
+                var clickpad = document.getElementById("clickPad"); 
+                clickpad.className = 'active';
+                simulateClick(clickpad);
+                break;
+            case 81: //'c'
+                var combo0pad = document.getElementById("combo0Pad"); 
+                combo0pad.className = 'active';
+                simulateClick(combo0pad);
+                break;
         }
     }
     function keyboardUp(key) {
@@ -153,6 +210,14 @@
             case 76: //'l'
                 var hihatpad = document.getElementById("hihatPad"); 
                 hihatpad.className = '';
+                break;
+            case 67: //'c'
+                var clickpad = document.getElementById("clickPad"); 
+                clickpad.className = '';
+                break;
+        	case 81: //'c'
+                var combo0pad = document.getElementById("combo0Pad"); 
+                combo0pad.className = '';
                 break;
         }
     }
