@@ -7,6 +7,12 @@
 </head>
 
 <style>
+	body{
+		background-color: blue;
+	}
+	h1 {
+		text-align: center;
+	}
     button {
         padding: 5px;
         background: rgb(200, 200, 200);
@@ -22,30 +28,58 @@
         border: 1px solid rgb(0,0,0);
         box-shadow: 0 0 2px 0 rgb(0,0,0);
     }
-    div#kick{
+    /*div#kick{
         width:130px;
-        height:600px;
+        height:220px;
         float:left;
     }
     #snare{
         width:130px;
-        height:600px;
+        height:220px;
         float:left;
     }
     #hihat{
         width:130px;
-        height:600px;
+        height:220px;
         float:left;
     }
     #click{
         width:130px;
-        height:600px;
+        height:220px;
         float:left;
+    }*/
+    .sound{
+    	width:130px;
+    	min-height:200px; 
     }
-    #combo0{
-        width:130px;
-        height:600px;
-        float:left;
+    .combo{
+    	background-color: yellow;
+    	width:130px;
+       min-height:180px;
+    }
+    .gridContainer{
+    	background-color: red;
+    	max-width: 600px;
+    	max-height: 660px;
+    	display: inline-grid;
+    	grid-template-columns: 33% 33% 33%;
+    	grid-template-rows: 33% 33% 33%;
+    }
+    .checkboxContainer{
+    	max-width: 150px;
+    	max-height: 100px;
+    	min-height: 64px;
+    	display: inline-grid;
+    	grid-template-columns: 33% 33% 33%;
+    	grid-template-rows: 33% 33% 33%;
+    }
+    .verticalContainer{
+    	display: inline-flex;
+    	flex-direction: column;
+    }
+    .horizontalContainer{
+    	display: inline-flex;
+    	flex-direction: row;
     }
     input.volume {
         width:120px;
@@ -58,78 +92,130 @@
 <h1> Homework#1: Beatbox </h1>
 <br>
 
-<div id = "kick" align = "center">
-    <button id="kickPad" onmousedown="playdrum(0)" > Kick ('a' key)</button>
-    <p id="kickVolLabel"></p>
-    <input class="volume" onchange="changegain(0,this.value)" id="kickVol" title="Kick volume" type="range" min="-24" max ="0" value = "-12">
-</div>
-<div id = "snare" align = "center">
-    <button id="snarePad" onmousedown="playdrum(1)" > Snare ('s' key)</button>
-    <p id="snareVolLabel"></p>
-    <input class="volume" onchange="changegain(1,this.value)" id="snareVol" title="Snare volume" type="range" min="-24" max ="0" value = "-12">
-</div>
-<div id = "hihat" align = "center">
-    <button id="hihatPad" onmousedown="playdrum(2)"> Hihat ('l' key)</button>
-    <p id="hihatVolLabel"></p>
-    <input class="volume" onchange="changegain(2,this.value)" id="hihatVol" title="Hihat volume" type="range" min="-24" max ="0" value = "-12">
-</div>
-<div id = "click" align = "center">
-    <button id="clickPad" onmousedown="playdrum(3)"> Click ('c' key)</button>
-    <p id="clickVolLabel"></p>
-    <input class="volume" onchange="changegain(3,this.value)" id="clickVol" title="Click volume" type="range" min="-24" max ="0" value = "-12">
-</div>
+<div class="horizontalContainer">
+	<div class="gridContainer">
+		<div class="sound" id = "kick" align = "center">
+		    <button id="kickPad" onmousedown="playdrum(0)" > Kick ('q' key)</button>
+		    <p id="kickVolLabel"></p>
+		    <input class="volume" onchange="changegain(0,this.value)" id="kickVol" title="Kick volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "snare" align = "center">
+		    <button id="snarePad" onmousedown="playdrum(1)" > Snare ('w' key)</button>
+		    <p id="snareVolLabel"></p>
+		    <input class="volume" onchange="changegain(1,this.value)" id="snareVol" title="Snare volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "{P}" align = "center">
+		    <button id="{P}Pad" onmousedown="playdrum(2)"> {P} ('e' key)</button>
+		    <p id="{P}VolLabel"></p>
+		    <input class="volume" onchange="changegain(2,this.value)" id="{P}Vol" title="{P} volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "hihat" align = "center">
+		    <button id="hihatPad" onmousedown="playdrum(3)"> Hihat ('a' key)</button>
+		    <p id="hihatVolLabel"></p>
+		    <input class="volume" onchange="changegain(3,this.value)" id="hihatVol" title="Hihat volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "hihat2" align = "center">
+		    <button id="hihat2Pad" onmousedown="playdrum(4)"> Hihat2 ('s' key)</button>
+		    <p id="hihat2VolLabel"></p>
+		    <input class="volume" onchange="changegain(4,this.value)" id="hihat2Vol" title="Hihat2 volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "{k}" align = "center">
+		    <button id="{k}Pad" onmousedown="playdrum(5)"> {k} ('d' key)</button>
+		    <p id="{k}VolLabel"></p>
+		    <input class="volume" onchange="changegain(5,this.value)" id="{k}Vol" title="{k} volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "click" align = "center">
+		    <button id="clickPad" onmousedown="playdrum(6)"> Click ('a' key)</button>
+		    <p id="clickVolLabel"></p>
+		    <input class="volume" onchange="changegain(6,this.value)" id="clickVol" title="Click volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "clop" align = "center">
+		    <button id="clopPad" onmousedown="playdrum(7)"> Clop ('x' key)</button>
+		    <p id="clopVolLabel"></p>
+		    <input class="volume" onchange="changegain(7,this.value)" id="clopVol" title="Clop volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+		<div class="sound" id = "duckScratch" align = "center">
+		    <button id="duckScratchPad" onmousedown="playdrum(8)"> DuckScratch ('s' key)</button>
+		    <p id="duckScratchVolLabel"></p>
+		    <input class="volume" onchange="changegain(9,this.value)" id="duckScratchVol" title="DuckScratch volume" type="range" min="-24" max ="0" value = "-12">
+		</div>
+	</div>
 
-<div id = "combo0" align = "center">
-    <button id="combo0Pad" onmousedown="playcombo(0)"> Combo ('q' key)</button>
-    <p></p>
-    <input type="checkbox" name="kick" id="combo0_0"> <label>Kick</label>
-    <input type="checkbox" name="snare" id="combo0_1"> <label>Snare</label>
-    <input type="checkbox" name="hihat" id="combo0_2"> <label>Hihat</label>
-    <input type="checkbox" name="click" id="combo0_3"> <label>Click</label>
+	<div class="verticalContainer">
+		<div id = "combo0" align = "center" class="combo">
+		    <button id="combo0Pad" onmousedown="playcombo(0)"> Combo ('r' key)</button>
+		    <p></p>
+		    <div class="checkboxContainer" id="checkboxContainer0"></div>
+		</div>
+		<div id = "combo1" align = "center" class="combo">
+		    <button id="combo1Pad" onmousedown="playcombo(1)"> Combo ('f' key)</button>
+		    <p></p>
+		    <div class="checkboxContainer" id="checkboxContainer1"></div>
+		</div>
+		<div id = "combo2" align = "center" class="combo">
+		    <button id="combo2Pad" onmousedown="playcombo(2)"> Combo ('v' key)</button>
+		    <p></p>
+		    <div class="checkboxContainer" id="checkboxContainer2"></div>
+		</div>
+	</div>
 </div>
 
 <script>
-	var beatBoxSoundsNumber = 4
-	var comboBoxes = 1;
-    var context = new (window.AudioContext || window.webkitAudioContext)();
-    var buffers = new Array(beatBoxSoundsNumber); // 0 : kick, 1 : snare, 2 : hihat, 3 : click
-    var volume_id = new Array("kickVol","snareVol","hihatVol", "clickVol");
-    var volume_label_id = new Array("kickVolLabel","snareVolLabel","hihatVolLabel","clickVolLabel");
-    var gain_nodes = new Array(beatBoxSoundsNumber);
-    for (i  = 0; i < beatBoxSoundsNumber; i++) {
-        gain_nodes[i] = context.createGain();
-        var vol = document.getElementById(volume_id[i]).value;
-        gain_nodes[i].gain.value = db2gain(vol);
-        document.getElementById(volume_label_id[i]).innerHTML = 'Volume:  ' + vol + 'dB'; 
+	var beatBoxSoundsNumber = 9
+
+	var beatBoxSounds = new Map()
+		beatBoxSounds.set(81, "kick")
+		beatBoxSounds.set(87 , "snare")
+		beatBoxSounds.set(69 , "{P}")
+		beatBoxSounds.set(65 , "hihat")
+		beatBoxSounds.set(83 , "hihat2")
+		beatBoxSounds.set(68 , "{k}")
+		beatBoxSounds.set(90 , "click")
+		beatBoxSounds.set(88 , "clop")
+		beatBoxSounds.set(67 , "duckScratch")
+	
+	var comboBoxes = new Map()
+		comboBoxes.set(82, "combo0")
+		comboBoxes.set(70, "combo1")
+		comboBoxes.set(86, "combo2")
+	
+    var context = new (window.AudioContext || window.webkitAudioContext)()
+    var buffers = new Array(beatBoxSoundsNumber) // 0 : kick, 1 : snare, 2 : hihat, 3 : click, 4 : duckScratch, 5 : lipRoll
+    var gain_nodes = new Array(beatBoxSoundsNumber)
+    
+    var i = 0;
+    var xmls = []
+    for (var sound of beatBoxSounds.values()){
+    	
+    	//audio file loading
+    	xmls[i] = new XMLHttpRequest()
+    	xmls[i].open("Get",sound+".wav",true)
+    	xmls[i].responseType = "arraybuffer"
+    	xmls[i].onload = function(){
+    		var index = xmls.indexOf(this)
+    	    context.decodeAudioData(xmls[index].response, function(buffer){buffers[index] = buffer})
+    	}
+    	xmls[i].send()
+
+    	//gain nodes
+        gain_nodes[i] = context.createGain()
+
+        var vol = document.getElementById(sound+"Vol").value
+        gain_nodes[i].gain.value = db2gain(vol)
+        document.getElementById(sound+"VolLabel").innerHTML = 'Volume:  ' + vol + 'dB'
+    
+        //checkboxes
+        for(c = 0; c < comboBoxes.size;	 c++){
+        	var container = document.getElementById("checkboxContainer"+c)
+        	var checkbox = document.createElement("input")
+        	checkbox.type = "checkbox"
+        	checkbox.name = sound
+        	checkbox.id = "combo"+c+"_"+sound
+        	container.appendChild(checkbox)
+		}
+
+        i++;
     }
-    var kick = new XMLHttpRequest();
-    kick.open("Get","kick.wav",true);
-    kick.responseType = "arraybuffer";
-    kick.onload = function(){
-        context.decodeAudioData(kick.response, function(buffer){buffers[0] = buffer;});
-    }
-    kick.send();
-    var snare = new XMLHttpRequest();
-    snare.open("Get","snare.wav",true);
-    snare.responseType = "arraybuffer";
-    snare.onload = function(){
-        context.decodeAudioData(snare.response, function(buffer){buffers[1] = buffer;});
-    }
-    snare.send();
-    var hihat = new XMLHttpRequest();
-    hihat.open("Get","hihat.wav",true);
-    hihat.responseType = "arraybuffer";
-    hihat.onload = function(){
-        context.decodeAudioData(hihat.response, function(buffer){buffers[2] = buffer;});
-    }
-    hihat.send();
-	var click = new XMLHttpRequest();
-    click.open("Get","click.wav",true);
-    click.responseType = "arraybuffer";
-    click.onload = function(){
-        context.decodeAudioData(click.response, function(buffer){buffers[3] = buffer;});
-    }
-    click.send();
 
     window.onload=function(){
         window.addEventListener('keydown', function (key) {
@@ -147,79 +233,44 @@
     }
 
     function playcombo(x) {
-    	for(i = 0; i < beatBoxSoundsNumber; ++i){
-	        if (document.getElementById("combo"+x+"_"+i).checked){
+    	var i = 0;
+    	for(var sound of beatBoxSounds.values()){
+	        if (document.getElementById("combo"+x+"_"+sound).checked){
 	        	var source = context.createBufferSource()
 		        source.buffer = buffers[i]
 		        source.connect(gain_nodes[i]).connect(context.destination) 
 		        source.start()
     		}
+    		i++
     	}
     }
 
     function changegain(i,changedvalue){
-        gain_nodes[i].gain.value = db2gain(changedvalue);
-        document.getElementById(volume_label_id[i]).innerHTML = 'Volume:  ' + changedvalue + 'dB'; 
+        gain_nodes[i].gain.value = db2gain(changedvalue)
+        var iterator = beatBoxSounds.values()
+        var ite = iterator.next()
+        for(let x = 0; x < i && !ite.done; ++x){
+        	ite = iterator.next()
+        }
+        document.getElementById(ite.value+"VolLabel").innerHTML = 'Volume:  ' + changedvalue + 'dB'
     }
     function db2gain(db_gain) {
         //10^(db/20) = P/P0
-
         var gain = Math.pow(10, (db_gain/20))
         return gain
     }
     // keyboard mapping 
     function keyboardDown(key) {
-        switch (key.keyCode) {
-            case 65: //'a'
-                var kickpad = document.getElementById("kickPad"); 
-                kickpad.className = 'active';
-                simulateClick(kickpad);
-                break;
-            case 83: //'s'
-                var snarepad = document.getElementById("snarePad"); 
-                snarepad.className = 'active';
-                simulateClick(snarepad);
-                break;
-            case 76: //'l'
-                var hihatpad = document.getElementById("hihatPad"); 
-                hihatpad.className = 'active';
-                simulateClick(hihatpad);
-                break;
-            case 67: //'c'
-                var clickpad = document.getElementById("clickPad"); 
-                clickpad.className = 'active';
-                simulateClick(clickpad);
-                break;
-            case 81: //'c'
-                var combo0pad = document.getElementById("combo0Pad"); 
-                combo0pad.className = 'active';
-                simulateClick(combo0pad);
-                break;
+        var pad = document.getElementById((beatBoxSounds.get(key.keyCode)||comboBoxes.get(key.keyCode)) + "Pad")
+        if(pad != null){
+        	pad.className = 'active'
+            simulateClick(pad)
         }
     }
     function keyboardUp(key) {
-        switch (key.keyCode) {
-            case 65: //'a'
-                var kickpad = document.getElementById("kickPad"); 
-                kickpad.className = '';
-                break;
-            case 83: //'s'
-                var snarepad = document.getElementById("snarePad"); 
-                snarepad.className = '';
-                break;
-            case 76: //'l'
-                var hihatpad = document.getElementById("hihatPad"); 
-                hihatpad.className = '';
-                break;
-            case 67: //'c'
-                var clickpad = document.getElementById("clickPad"); 
-                clickpad.className = '';
-                break;
-        	case 81: //'c'
-                var combo0pad = document.getElementById("combo0Pad"); 
-                combo0pad.className = '';
-                break;
-        }
+        var pad = document.getElementById((beatBoxSounds.get(key.keyCode)||comboBoxes.get(key.keyCode)) + "Pad")
+        if(pad != null)
+	        pad.className = ''
     }
     // simulated mousedown on buttons
     function simulateClick(element) {
@@ -228,7 +279,7 @@
             cancelable: true,
             view: window
         });
-        element.dispatchEvent(event);
+        element.dispatchEvent(event)
     }
 </script>
 </body>
