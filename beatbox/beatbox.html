@@ -129,10 +129,10 @@
 	    <p id="clopVolLabel"></p>
 	    <input class="volume" onchange="changegain(7,this.value)" id="clopVol" title="Clop volume" type="range" min="-24" max ="0" value = "-12">
 	</div>
-	<div class="sound" id = "duckScratch" align = "center">
-	    <button id="duckScratchPad" onmousedown="playdrum(8)"> DuckScratch ('s' key)</button>
-	    <p id="duckScratchVolLabel"></p>
-	    <input class="volume" onchange="changegain(9,this.value)" id="duckScratchVol" title="DuckScratch volume" type="range" min="-24" max ="0" value = "-12">
+	<div class="sound" id = "{t}" align = "center">
+	    <button id="{t}Pad" onmousedown="playdrum(8)"> {t} ('s' key)</button>
+	    <p id="{t}VolLabel"></p>
+	    <input class="volume" onchange="changegain(8,this.value)" id="{t}Vol" title="{t} volume" type="range" min="-24" max ="0" value = "-12">
 	</div>
 
 	<div></div>
@@ -156,7 +156,7 @@
 		beatBoxSounds.set(68 , "{k}")
 		beatBoxSounds.set(90 , "click")
 		beatBoxSounds.set(88 , "clop")
-		beatBoxSounds.set(67 , "duckScratch")
+		beatBoxSounds.set(67 , "{t}")
 	
 	var comboBoxes = new Map()
 		comboBoxes.set(82, "combo0")
@@ -164,7 +164,7 @@
 		comboBoxes.set(86, "combo2")
 	
     var context = new (window.AudioContext || window.webkitAudioContext)()
-    var buffers = new Array(beatBoxSoundsNumber) // 0 : kick, 1 : snare, 2 : hihat, 3 : click, 4 : duckScratch, 5 : lipRoll
+    var buffers = new Array(beatBoxSoundsNumber)
     var gain_nodes = new Array(beatBoxSoundsNumber)
     
     var i = 0;
