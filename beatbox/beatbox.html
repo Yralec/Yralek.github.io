@@ -106,10 +106,10 @@
 	    <p id="hihat2VolLabel"></p>
 	    <input class="volume" onchange="changegain(4,this.value)" id="hihat2Vol" title="Hihat2 volume" type="range" min="-24" max ="0" value = "-12">
 	</div>
-	<div class="sound" id = "{k}" align = "center">
-	    <button id="{k}Pad" onmousedown="playdrum(5)"> {k} ('d' key)</button>
-	    <p id="{k}VolLabel"></p>
-	    <input class="volume" onchange="changegain(5,this.value)" id="{k}Vol" title="{k} volume" type="range" min="-24" max ="0" value = "-12">
+	<div class="sound" id = "{t}" align = "center">
+	    <button id="{t}Pad" onmousedown="playdrum(5)"> {t} ('s' key)</button>
+	    <p id="{t}VolLabel"></p>
+	    <input class="volume" onchange="changegain(5,this.value)" id="{t}Vol" title="{t} volume" type="range" min="-24" max ="0" value = "-12">
 	</div>
 
 	<div></div>
@@ -129,10 +129,10 @@
 	    <p id="clopVolLabel"></p>
 	    <input class="volume" onchange="changegain(7,this.value)" id="clopVol" title="Clop volume" type="range" min="-24" max ="0" value = "-12">
 	</div>
-	<div class="sound" id = "{t}" align = "center">
-	    <button id="{t}Pad" onmousedown="playdrum(8)"> {t} ('s' key)</button>
-	    <p id="{t}VolLabel"></p>
-	    <input class="volume" onchange="changegain(8,this.value)" id="{t}Vol" title="{t} volume" type="range" min="-24" max ="0" value = "-12">
+	<div class="sound" id = "{k}" align = "center">
+	    <button id="{k}Pad" onmousedown="playdrum(8)"> {k} ('d' key)</button>
+	    <p id="{k}VolLabel"></p>
+	    <input class="volume" onchange="changegain(8,this.value)" id="{k}Vol" title="{k} volume" type="range" min="-24" max ="0" value = "-12">
 	</div>
 
 	<div></div>
@@ -153,10 +153,10 @@
 		beatBoxSounds.set(69 , "{P}")
 		beatBoxSounds.set(65 , "hihat")
 		beatBoxSounds.set(83 , "hihat2")
-		beatBoxSounds.set(68 , "{k}")
+		beatBoxSounds.set(68 , "{t}")
 		beatBoxSounds.set(90 , "click")
 		beatBoxSounds.set(88 , "clop")
-		beatBoxSounds.set(67 , "{t}")
+		beatBoxSounds.set(67 , "{k}")
 	
 	var comboBoxes = new Map()
 		comboBoxes.set(82, "combo0")
