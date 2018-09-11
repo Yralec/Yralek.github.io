@@ -8,7 +8,7 @@
 
 <style>
 	h1 {
-		margin-left: 20px;
+		margin-left: 40px;
 	}
     button {
         padding: 5px;
@@ -24,6 +24,9 @@
         background: rgb(100, 100, 100);
         border: 1px solid rgb(0,0,0);
         box-shadow: 0 0 2px 0 rgb(0,0,0);
+    }
+    .backgroundMusic{
+        margin-left:50px;
     }
     .sound{
     	width: fit-content;
@@ -143,8 +146,27 @@
 	</div>
 
 </div>
+<br>
+<br>
+<br>
+<div class="backgroundMusic">
+    <input type="file" name="backgroundMusicFile" id="backgroundMusicFile">
+    <button class="backgroundMusicControl" onmousedown="playMusic()">Play</button>
+    <button class="backgroundMusicControl" onmousedown="pauseMusic()">Stop</button>
+</div>
+<br>
+<br>
+<br>
+<br>
+<footer>Inspired by: <a>https://github.com/juhannam/ctp431-2018/tree/master/session1</a></footer>
+
 
 <script>
+
+    var context
+    var backgroundMusicBuffer
+    var backgroundMusicControls
+
 	var beatBoxSoundsNumber = 9
 
 	var beatBoxSounds = new Map()
@@ -163,52 +185,100 @@
 		comboBoxes.set(70, "combo1")
 		comboBoxes.set(86, "combo2")
 	
-    var context = new (window.AudioContext || window.webkitAudioContext)()
     var buffers = new Array(beatBoxSoundsNumber)
     var gain_nodes = new Array(beatBoxSoundsNumber)
     
     var i = 0;
     var xmls = []
-    for (var sound of beatBoxSounds.values()){
-    	
-    	//audio file loading
-    	xmls[i] = new XMLHttpRequest()
-    	xmls[i].open("Get",sound+".wav",true)
-    	xmls[i].responseType = "arraybuffer"
-    	xmls[i].onload = function(){
-    		var index = xmls.indexOf(this)
-    	    context.decodeAudioData(xmls[index].response, function(buffer){buffers[index] = buffer})
-    	}
-    	xmls[i].send()
 
-    	//gain nodes
-        gain_nodes[i] = context.createGain()
+        window.onload = () => {
 
-        var vol = document.getElementById(sound+"Vol").value
-        gain_nodes[i].gain.value = db2gain(vol)
-        document.getElementById(sound+"VolLabel").innerHTML = 'Volume:  ' + vol + 'dB'
-    
-        //checkboxes
-        for(c = 0; c < comboBoxes.size;	 c++){
-        	var container = document.getElementById("checkboxContainer"+c)
-        	var checkbox = document.createElement("input")
-        	checkbox.type = "checkbox"
-        	checkbox.name = sound
-        	checkbox.id = "combo"+c+"_"+sound
-        	container.appendChild(checkbox)
-		}
+        backgroundMusicControls =document.getElementsByClassName("backgroundMusicControl")
 
-        i++;
-    }
-
-    window.onload=function(){
         window.addEventListener('keydown', function (key) {
             keyboardDown(key);
         }, false);
         window.addEventListener('keyup', function (key) {
             keyboardUp(key);
         }, false);
+
+        var bkgdMusicFile = document.getElementById("backgroundMusicFile")
+        bkgdMusicFile.addEventListener("change", backgroundMusicChanged, false)
+
+        context = new (window.AudioContext || window.webkitAudioContext)()
+
+
+        for (var sound of beatBoxSounds.values()){
+            
+            //audio file loading
+            xmls[i] = new XMLHttpRequest()
+            xmls[i].open("Get",sound+".wav",true)
+            xmls[i].responseType = "arraybuffer"
+            xmls[i].onload = function(){
+                var index = xmls.indexOf(this)
+                context.decodeAudioData(xmls[index].response, function(buffer){buffers[index] = buffer})
+            }
+            xmls[i].send()
+
+            //gain nodes
+            gain_nodes[i] = context.createGain()
+
+            var vol = document.getElementById(sound+"Vol").value
+            gain_nodes[i].gain.value = db2gain(vol)
+            document.getElementById(sound+"VolLabel").innerHTML = 'Volume:  ' + vol + 'dB'
+        
+            //checkboxes
+            for(c = 0; c < comboBoxes.size;  c++){
+                var container = document.getElementById("checkboxContainer"+c)
+                var checkbox = document.createElement("input")
+                checkbox.type = "checkbox"
+                checkbox.name = sound
+                checkbox.id = "combo"+c+"_"+sound
+                container.appendChild(checkbox)
+            }
+
+            i++;
+        }
     }
+
+    function backgroundMusicChanged(e){
+        pauseMusic()
+        for(let i = 0; i < backgroundMusicControls.length; ++i){
+            backgroundMusicControls[i].disabled = true
+        }
+
+        var file = e.target.files[0]
+        var fileReader = new FileReader()
+        fileReader.addEventListener("load", backgroundMusicLoaded, false)
+        fileReader.readAsArrayBuffer(file)
+    }
+
+    var source = null;
+
+    function playMusic(){
+        source = context.createBufferSource()
+        source.buffer = backgroundMusicBuffer
+        source.connect(context.destination)
+        source.start()
+    }
+
+    function pauseMusic(){
+        if(source){
+            source.stop()
+        }
+    }
+
+    function backgroundMusicLoaded(e){
+        context.decodeAudioData(e.target.result, (buffer)=>{
+            backgroundMusicBuffer = buffer;
+            
+            for(let i = 0; i < backgroundMusicControls.length; ++i){
+                backgroundMusicControls[i].disabled = false;
+            }
+        })
+    }
+
+
     function playdrum(i) {
         var source = context.createBufferSource()
         source.buffer = buffers[i]
