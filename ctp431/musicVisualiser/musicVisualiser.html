@@ -65,7 +65,7 @@ function draw() {
 
 		highestFreq = getMaxFreqIndex(byteFrequencyData)
 		
-		
+		console.log(highestFreq)
 		stroke('hsb('+highestFreq*360/byteFrequencyData.length+',60,30)')
 
 
@@ -80,17 +80,18 @@ function draw() {
 }
 
 function getMaxFreqIndex(data){
-	maxV = 0
-	maxI = 0
+	var maxV = 0
+	var maxI = 0
 	for(var i = 0; i < data.length; ++i){
 		if(data[i] >= maxV){
 			maxV = data[i]
 			maxI = i
 		}
 	}
+	return maxI
 }
 
-theta = 0
+var theta = 0
 function timeDomain(){
 	analyser2.getByteTimeDomainData(timeDomainData)
 
