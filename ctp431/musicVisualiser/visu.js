@@ -1,9 +1,14 @@
 var song
 var snowflakes = []
-
+var lower_freqs = [22, 44, 88, 177, 355, 710, 1420, 2840, 5680, 11360]
+var upper_freqs = [44, 88, 177, 355, 710, 1420, 2840, 5680, 11360, 22720]
+var center_freqs = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
 
 function setup(){
 	song = loadSound("song.mp3")
+
+	//https://www.parts-express.com/Data/Default/Images/Catalog/Original/294-836_HR_0.jpg
+	speaker = loadImage("speaker.png")
 	createCanvas(640, 480)
 
 	amp = new p5.Amplitude()
@@ -32,7 +37,8 @@ function mousePressed(){
 }
 
 function draw(){
-	background(200)
+
+	background('rgba(200, 200, 200, 0.2)')
 
 	var dirY = (mouseY / height - 0.5) * 4;
 	var dirX = (mouseX / width - 0.5) * 4;
@@ -42,16 +48,26 @@ function draw(){
 
 	var rms = amp.getLevel()
 	var spectrum = fft.analyze()
-	var waveform = fft.waveform()
+	//var waveform = fft.waveform()
 
-	if(rms > 0.15){
-		for (let flake of snowflakes) {
-	 	   flake.bounce(rms) // update snowflake position
+	if(rms > 0.1){
+		for(var i = 0; i < 10; ++i){
+			var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
+			for (let flake of snowflakes) {
+	 		   if(flake.posX > i*width/10 && flake.posX < (i+1)*width/10)
+	 		   flake.bounce(0.2*Math.sqrt(energy/(255*2))) // update snowflake position
+			}
 		}
+	}
+	if(rms > 0.2){
+		var a = Math.random()*255
+		var b = Math.random()*255
+		var c = Math.random()*255
+		background('rgba('+a+','+b+','+c+',0.8)')
 	}
 
 	// create a random number of snowflakes each frame
-	for (var i = 0; i < random(2); i++) {
+	for (var i = 0; i < random(7); i++) {
 		snowflakes.push(new snowflake()); // append snowflake object
 	}
 
@@ -63,11 +79,13 @@ function draw(){
 	    flake.update(t) // update snowflake position
 	    flake.display() // draw snowflake
 	}
+
+	drawSpeakers()
 }
 
 var gravity = 3
 // snowflake class
-function snowflake() {
+function snowflake(){
 	// initialize coordinates
 	this.posX = 0
 	this.posY = 3* height/4 + random(-50, 0)
@@ -116,6 +134,17 @@ function drawGradient(x, y, radius, hue) {
     ellipse(x, y, r, r);
     hue = (hue + 1) % 360;
   }
+}
+
+function drawSpeakers(){
+
+	speakers = 10
+	for(var i = 0; i < speakers; ++i){
+		var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
+
+		image(speaker, i*width/speakers, height-(30*(1+energy/255)), width/speakers, 50)
+	}
+	scale(2)
 }
 
 //https://p5js.org/examples/simulate-snowflakes.html
