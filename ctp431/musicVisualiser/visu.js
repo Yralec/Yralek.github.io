@@ -5,8 +5,13 @@ var upper_freqs = [44, 88, 177, 355, 710, 1420, 2840, 5680, 11360, 22720]
 var center_freqs = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
 var radialGradients = []
 
-function setup(){
+
+function preload(){
 	song = loadSound("song.mp3")
+}
+
+function setup(){
+
 
 	//https://www.parts-express.com/Data/Default/Images/Catalog/Original/294-836_HR_0.jpg
 	speaker = loadImage("speaker.png")
