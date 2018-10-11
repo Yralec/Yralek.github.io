@@ -167,7 +167,7 @@ function drawSpeakers(){
 	}*/
 
 	//draw colour bands
-	colorMode(HSB, 100, 100)
+	colorMode(HSB, 100)
 	for(var i = 0; i < speakers; ++i){
 		var hue = i*360/speakers
 		var other = 100*energy/255
