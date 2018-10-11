@@ -3,6 +3,7 @@ var snowflakes = []
 var lower_freqs = [22, 44, 88, 177, 355, 710, 1420, 2840, 5680, 11360]
 var upper_freqs = [44, 88, 177, 355, 710, 1420, 2840, 5680, 11360, 22720]
 var center_freqs = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+var radialGradients = []
 
 function setup(){
 	song = loadSound("song.mp3")
@@ -60,10 +61,30 @@ function draw(){
 		}
 	}
 	if(rms > 0.2){
-		var a = Math.random()*255
-		var b = Math.random()*255
-		var c = Math.random()*255
-		background('rgba('+a+','+b+','+c+',0.8)')
+		var a = Math.round(Math.random()*255)
+		var b = Math.round(Math.random()*255)
+		var c = Math.round(Math.random()*255)
+		fft.getCentroid()
+		var x = Math.round((width-40)*Math.random())+20
+		var y = Math.round((height-60)*Math.random())+20
+		radialGradients.push([x,y,1])
+		//background('rgba('+a+','+b+','+c+',0.8)')
+	}
+
+	colorMode(HSB)
+	for(var i = 0; i < radialGradients.length; ++i){
+	console.log(radialGradients[i][2])
+
+		if(radialGradients[i][2] >= 20){
+			radialGradients.splice(i, 1)
+		} else{
+			var x = radialGradients[i][0]
+			var y = radialGradients[i][1]
+			var r = radialGradients[i][2]
+			fill(10*r, 90, 90)
+			ellipse(x, y, 2*r)
+			radialGradients[i][2] += 1
+		}
 	}
 
 	// create a random number of snowflakes each frame
@@ -138,13 +159,15 @@ function drawGradient(x, y, radius, hue) {
 
 function drawSpeakers(){
 
+	imageMode(CENTER)
 	speakers = 10
 	for(var i = 0; i < speakers; ++i){
 		var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
-
-		image(speaker, i*width/speakers, height-(30*(1+energy/255)), width/speakers, 50)
+		var x = (0.5+i)*width/speakers
+		var y = height -30
+		var scale = width/speakers*(0.6+energy/255)
+		image(speaker, x, y, scale, scale)
 	}
-	scale(2)
 }
 
 //https://p5js.org/examples/simulate-snowflakes.html
