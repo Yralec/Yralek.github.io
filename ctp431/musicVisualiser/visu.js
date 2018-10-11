@@ -50,16 +50,16 @@ function draw(){
 	var rms = amp.getLevel()
 	var spectrum = fft.analyze()
 	//var waveform = fft.waveform()
-
-	if(rms > 0.1){
+	drawSpeakers()
+	//if(rms > 0.1){
 		for(var i = 0; i < 10; ++i){
 			var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
 			for (let flake of snowflakes) {
 	 		   if(flake.posX > i*width/10 && flake.posX < (i+1)*width/10)
-	 		   flake.bounce(0.2*Math.sqrt(energy/(255*2))) // update snowflake position
+	 		   flake.bounce(0.2*Math.sqrt(energy/(255*4))) // update snowflake position
 			}
 		}
-	}
+	//}
 	if(rms > 0.2){
 		var a = Math.round(Math.random()*255)
 		var b = Math.round(Math.random()*255)
@@ -73,8 +73,6 @@ function draw(){
 
 	colorMode(HSB)
 	for(var i = 0; i < radialGradients.length; ++i){
-	console.log(radialGradients[i][2])
-
 		if(radialGradients[i][2] >= 20){
 			radialGradients.splice(i, 1)
 		} else{
@@ -93,7 +91,7 @@ function draw(){
 	}
 
 	noStroke()
-	var c = color("black")
+	var c = color("white")
 	fill(c)
 	// loop through snowflakes with a for..of loop
 	for (let flake of snowflakes) {
@@ -101,7 +99,6 @@ function draw(){
 	    flake.display() // draw snowflake
 	}
 
-	drawSpeakers()
 }
 
 var gravity = 3
@@ -133,7 +130,7 @@ function snowflake(){
 		}
 
 		// delete snowflake if past end of screen
-		if (this.posY > height + 10 || this.posY < -10 || this.lifeTime < 0) {
+		if (this.posY > height - 10 || this.posY < -10 || this.lifeTime < 0) {
 			let index = snowflakes.indexOf(this)
 			snowflakes.splice(index, 1)
 		}
@@ -161,12 +158,24 @@ function drawSpeakers(){
 
 	imageMode(CENTER)
 	speakers = 10
-	for(var i = 0; i < speakers; ++i){
+	/*for(var i = 0; i < speakers; ++i){
 		var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
 		var x = (0.5+i)*width/speakers
 		var y = height -30
 		var scale = width/speakers*(0.6+energy/255)
 		image(speaker, x, y, scale, scale)
+	}*/
+
+	//draw colour bands
+	colorMode(HSB, 100, 100)
+	for(var i = 0; i < speakers; ++i){
+		var hue = i*360/speakers
+		var other = 100*energy/255
+		fill(hue,other,80)
+		var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
+		var x = i*width/speakers
+		var y = height
+		rect(x, 0, width/speakers, height)
 	}
 }
 
