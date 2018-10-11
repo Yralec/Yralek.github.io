@@ -172,9 +172,9 @@ function drawSpeakers(){
 	}*/
 
 	//draw colour bands
-	colorMode(HSB, 100)
+	colorMode(HSB)
 	for(var i = 0; i < speakers; ++i){
-		var hue = i*100/speakers
+		var hue = i*360/speakers
 		var other = 100*energy/255
 		fill(hue,other,80)
 		var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
