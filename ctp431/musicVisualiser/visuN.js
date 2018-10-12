@@ -8,6 +8,7 @@ var radialGradients = []
 var alphaVal = 0.2
 var rms = 0;
 var t = 0
+var particleColoringCooldown = 30
 
 var byteFrequencyData
 var timeDomainData
@@ -60,7 +61,13 @@ function draw() {
 		//updateGradients()
 		//timeDomain()
 		particles()
-
+		//if(particleColoringCooldown > 0){
+		//	--particleColoringCooldown
+		//} else if(power - oldPower > 0.1){
+		if(power - oldPower > 0.1){
+			particleColoring()
+			//particleColoringCooldown = 10
+		}
 		oldPower = power
 	}
 }
@@ -94,6 +101,21 @@ function particles(){
 	pop()
 }
 
+function particleColoring(){
+	var centroid = fft.getCentroid()
+	var index = random(10)
+	particleColoringCooldown = 30
+	colorMode(HSB)
+	var startAngle = (2*PI*index/10)%(2*PI)
+	var endAngle = (2*PI*(index+1)/10)%(2*PI)
+	var c = color(index*36, 80, 80)
+
+	for(let particle of particleArray){
+		if(particle.initialangle > startAngle && particle.initialangle < endAngle){
+			particle.colour = c
+		}
+	}
+}
 
 var theta = 0
 
@@ -251,6 +273,7 @@ function particle(){
 	this.maxSpeed = -2*pow(this.size, 0.5)
 	this.lifeTime = 60
 	this.minRadius = 25
+	this.colour = color('white')
 
 	this.update = function(time) {
 
@@ -282,6 +305,7 @@ function particle(){
 	}
 
 	this.display = function() {
+		fill(this.colour)
 		var posX = this.radius * cos(this.initialangle)
 		var posY = this.radius * sin(this.initialangle)
 		ellipse(posX, posY, this.size)
