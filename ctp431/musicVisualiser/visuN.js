@@ -1,4 +1,13 @@
+var log44100 = Math.log(44100)
 var gradientCircles = []
+var particleArray = []
+var lower_freqs = [22, 44, 88, 177, 355, 710, 1420, 2840, 5680, 11360]
+var upper_freqs = [44, 88, 177, 355, 710, 1420, 2840, 5680, 11360, 22720]
+var center_freqs = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+var radialGradients = []
+var alphaVal = 0.2
+var rms = 0;
+var t = 0
 
 var byteFrequencyData
 var timeDomainData
@@ -8,8 +17,10 @@ var pause = false
 function mousePressed(){
 	if(song.isPlaying()){
 		song.pause()
+		pause = true
 	} else{
 		song.play()
+		pause = false
 	}
 }
 
@@ -19,7 +30,7 @@ function preload(){
 
 function setup() {
 	song.play()
-	createCanvas(640, 480);
+	createCanvas(640, 640);
 	background(0, 0, 0)
 
 	amp = new p5.Amplitude()
@@ -30,31 +41,65 @@ var radius1 = 200
 var radius2 = 100
 var hueV = 0
 
+var power = 0
 var oldPower = 0
 
 function draw() {
 	if (!pause) {
 
-		background('rgba(0,0,0,0.03)')
+		var rms = amp.getLevel()
+		var db = 20.0*Math.log10(rms);
+		power = 70 + db
+
+		background('rgba(0,0,0,'+alphaVal+')')
 
 		timeDomainData = fft.waveform()
 		byteFrequencyData = fft.analyze()
 
 		//createGradient()
 		//updateGradients()
-		timeDomain()
+		//timeDomain()
+		particles()
 
+		oldPower = power
 	}
+}
+
+function particles(){
+	push()
+	t = frameCount/60
+
+	rms = amp.getLevel()
+
+	//for(var i = 0; i < 10; ++i){
+		//var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
+		for (let particle of particleArray) {
+ 		   particle.bounce(rms)		//0.2*Math.sqrt(energy/(255*4)))
+		}
+	//}
+
+
+	for (var i = 0; i < random(Math.round(rms*5)); i++) {
+		particleArray.push(new particle())
+	}
+
+	translate(width/2, height/2)
+	noStroke()
+	var c = color("white")
+	fill(c)
+	for (let particle of particleArray) {
+	    particle.update(t)
+	    particle.display()
+	}
+	pop()
 }
 
 
 var theta = 0
 
 function timeDomain() {
+	push()
 
-	var rms = amp.getLevel()
-	var db = 20.0*Math.log10(rms);
-	var power = 70 + db
 	var distance = 0
 	if (power - oldPower > 0) {
 		distance = power
@@ -63,7 +108,7 @@ function timeDomain() {
 	}
 
 	var size = distance * 1.8
-	theta += 10 / 180
+	theta += rms*5*10 / 180
 	translate(width / 2, height / 2)
 
 
@@ -71,48 +116,48 @@ function timeDomain() {
 	colorMode(HSB, 360, 100, 100, 1)
 	var c = color(360 - (power/70 * 360)%360, 50, 60)
 	stroke(c)
-	drawSpectrumCircle(timeDomainData)
+	//drawSpectrumCircle(timeDomainData)
 
 	rotate(theta)
 
+	var divisor = 4 + 5*rms
 	//Squares
 	var ex = 40
 	colorMode(HSB)
-	var c = color((power/70 * 360)%360, 50, 60)
+	var c = color((3*power/70 * 360)%360, 50, 60)
 	stroke(c)
 
-	translate(-width / 4, -height / 4)
+	translate(-width / divisor, -height / divisor)
 	rotate(-theta)
 	drawSpectrumSquare(timeDomainData, size, distance, ex)
 	rotate(theta)
-	translate(width / 4, height / 4)
+	translate(width / divisor, height / divisor)
 
 
-	translate(width / 4, -height / 4)
+	translate(width / divisor, -height / divisor)
 	rotate(-theta)
 	drawSpectrumSquare(timeDomainData, size, distance, ex)
 	rotate(theta)
-	translate(-width / 4, height / 4)
+	translate(-width / divisor, height / divisor)
 
 
-	translate(-width / 4, height / 4)
+	translate(-width / divisor, height / divisor)
 	rotate(-theta)
 	drawSpectrumSquare(timeDomainData, size, distance, ex)
 	rotate(theta)
-	translate(width / 4, -height / 4)
+	translate(width / divisor, -height / divisor)
 
 
-	translate(width / 4, height / 4)
+	translate(width / divisor, height / divisor)
 	rotate(-theta)
 	drawSpectrumSquare(timeDomainData, size, distance, ex)
 	rotate(theta)
-	translate(-width / 4, -height / 4)
+	translate(-width / divisor, -height / divisor)
 
 	translate(-width / 2, -height / 2)
 	rotate(theta)
 
-	oldPower = power
-
+	pop()
 }
 
 function drawSpectrumSquare(data, size, length, expansion) {
@@ -195,13 +240,50 @@ function updateGradients() {
 	}
 }
 
-function getEnergy(data) {
-	squareSum = 0
-	for (var i = 0; i < data.length; ++i) {
-		x = data[i] / 256 - 0.5
-		squareSum += x * x
+var gravity = -1
+// snowflake class
+function particle(){
+
+	this.radius = 0
+	this.initialangle = random(0, 2 * PI)
+	this.size = random(2, 5)
+	this.speed = pow(this.size, 0.5)
+	this.maxSpeed = -2*pow(this.size, 0.5)
+	this.lifeTime = 60
+	this.minRadius = 25
+
+	this.update = function(time) {
+
+
+		this.speed = Math.max(this.speed + gravity, this.maxSpeed)
+		if(this.radius == this.minRadius && this.speed < 0){
+			this.speed = 0
+		} else if(this.radius == 0.8*width/2 && this.speed > 0){
+			this.speed = 0
+		}
+
+		this.radius = Math.min(0.8*width/2, Math.max(this.radius + this.speed, this.minRadius))
+
+
+		if (this.lifeTime < 0) {
+			let index = particleArray.indexOf(this)
+			particleArray.splice(index, 1)
+		}
+		this.lifeTime -= 1
+	};
+
+	this.bounce = function(strength) {
+		//if(strength > 0.1){
+			if(power - oldPower > 0){
+
+				this.speed += power/10 //*strength
+			}
+		//}
 	}
-	rms = Math.sqrt(squareSum / data.length)
-	db = 20.0 * Math.log10(rms);
-	return db
+
+	this.display = function() {
+		var posX = this.radius * cos(this.initialangle)
+		var posY = this.radius * sin(this.initialangle)
+		ellipse(posX, posY, this.size)
+	};
 }

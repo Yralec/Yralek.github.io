@@ -12,7 +12,6 @@ function preload(){
 
 function setup(){
 
-
 	//https://www.parts-express.com/Data/Default/Images/Catalog/Original/294-836_HR_0.jpg
 	speaker = loadImage("speaker.png")
 	createCanvas(640, 480)
@@ -44,8 +43,6 @@ function mousePressed(){
 
 function draw(){
 
-	background('rgba(200, 200, 200, 0.2)')
-
 	var dirY = (mouseY / height - 0.5) * 4;
 	var dirX = (mouseX / width - 0.5) * 4;
 
@@ -55,7 +52,7 @@ function draw(){
 	var rms = amp.getLevel()
 	var spectrum = fft.analyze()
 	//var waveform = fft.waveform()
-	drawSpeakers()
+	drawRainbow()
 	//if(rms > 0.1){
 		for(var i = 0; i < 10; ++i){
 			var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
@@ -65,7 +62,7 @@ function draw(){
 			}
 		}
 	//}
-	if(rms > 0.2){
+	/*if(rms > 0.2){
 		var a = Math.round(Math.random()*255)
 		var b = Math.round(Math.random()*255)
 		var c = Math.round(Math.random()*255)
@@ -88,7 +85,7 @@ function draw(){
 			ellipse(x, y, 2*r)
 			radialGradients[i][2] += 1
 		}
-	}
+	}*/
 
 	// create a random number of snowflakes each frame
 	for (var i = 0; i < random(7); i++) {
@@ -162,7 +159,7 @@ function drawGradient(x, y, radius, hue) {
 function drawSpeakers(){
 
 	imageMode(CENTER)
-	speakers = 10
+	var speakers = 10
 	/*for(var i = 0; i < speakers; ++i){
 		var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
 		var x = (0.5+i)*width/speakers
@@ -170,17 +167,21 @@ function drawSpeakers(){
 		var scale = width/speakers*(0.6+energy/255)
 		image(speaker, x, y, scale, scale)
 	}*/
+}
 
+function drawRainbow(){
 	//draw colour bands
+	var bands = 10
 	colorMode(HSB)
-	for(var i = 0; i < speakers; ++i){
-		var hue = i*360/speakers
+	noStroke()
+	for(var i = 0; i < bands; ++i){
+		var hue = i*360/bands
 		var other = 100*energy/255
-		fill(hue,other,80)
+		fill(hue,other,100-other)
 		var energy = fft.getEnergy(lower_freqs[i], upper_freqs[i])
-		var x = i*width/speakers
+		var x = i*width/bands
 		var y = height
-		rect(x, 0, width/speakers, height)
+		rect(x, 0, width/bands, height)
 	}
 }
 
