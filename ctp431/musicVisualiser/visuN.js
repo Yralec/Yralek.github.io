@@ -61,12 +61,9 @@ function draw() {
 		//updateGradients()
 		//timeDomain()
 		particles()
-		//if(particleColoringCooldown > 0){
-		//	--particleColoringCooldown
-		//} else if(power - oldPower > 0.1){
 		if(power - oldPower > 0.1){
 			particleColoring()
-			//particleColoringCooldown = 10
+			particleColoring()
 		}
 		oldPower = power
 	}
@@ -103,9 +100,11 @@ function particles(){
 
 function particleColoring(){
 	var centroid = fft.getCentroid()
-	var index = random(10)
+
 	particleColoringCooldown = 30
 	colorMode(HSB)
+
+	var index = random(10)
 	var startAngle = (2*PI*index/10)%(2*PI)
 	var endAngle = (2*PI*(index+1)/10)%(2*PI)
 	var c = color(index*36, 80, 80)
