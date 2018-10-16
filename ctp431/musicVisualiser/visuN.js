@@ -105,7 +105,7 @@ function particleColoring(){
 }
 
 var gravity = -1
-var display = 0
+var display = 16
 var displayModes = 18
 
 function particle(){
@@ -209,8 +209,8 @@ function particle(){
 
 	particle.prototype.displayRotationAntiClockWise = function() {
 		fill(this.colour)
-		var posX = this.maxRadius*this.initialangle/(2*PI) * -cos(2*PI*this.radius/this.maxRadius + 2*PI*frameCount/60)
-		var posY = this.maxRadius*this.initialangle/(2*PI) * -sin(2*PI*this.radius/this.maxRadius + 2*PI*frameCount/60)
+		var posX = this.maxRadius*this.initialangle/(2*PI) * cos(-2*PI*this.radius/this.maxRadius - 2*PI*frameCount/60)
+		var posY = this.maxRadius*this.initialangle/(2*PI) * sin(-2*PI*this.radius/this.maxRadius - 2*PI*frameCount/60)
 		ellipse(posX, posY, this.size)
 	};
 
@@ -247,8 +247,8 @@ function particle(){
 
 
 function incrementDisplayOnBeat(){
-	if(power - oldPower > 0.15){
+	/*if(power - oldPower > 0.15){
 		display = Math.floor(random(displayModes))
 		frames = 0
-	}
+	}*/
 }
