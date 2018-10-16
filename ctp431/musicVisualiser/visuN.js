@@ -10,7 +10,7 @@ var particleColoringCooldown = 30
 
 var pause = false
 
-function mousePressed(){
+/*function mousePressed(){
 	if(song.isPlaying()){
 		song.pause()
 		pause = true
@@ -18,7 +18,7 @@ function mousePressed(){
 		song.play()
 		pause = false
 	}
-}
+}*/
 
 function preload(){
 	song = loadSound("song.mp3")
