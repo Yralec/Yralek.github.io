@@ -247,8 +247,8 @@ function particle(){
 
 
 function incrementDisplayOnBeat(){
-	/*if(power - oldPower > 0.15){
+	if(power - oldPower > 0.15){
 		display = Math.floor(random(displayModes))
 		frames = 0
-	}*/
+	}
 }
