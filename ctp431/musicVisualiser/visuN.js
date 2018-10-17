@@ -51,7 +51,7 @@ function draw() {
 			particleColoring()
 			particleColoring()
 		}
-		if(frames > 180){	//3 seconds and look to change
+		if(frames > 3.4*60){	//3 seconds and look to change
 			incrementDisplayOnBeat()
 		} else{
 			++frames
@@ -186,32 +186,36 @@ function particle(){
 		}
 	}
 
+	particle.prototype.show = function(x, y){
+		ellipse(x, y, 2*this.size)
+	}
+
 	particle.prototype.displayInwardsCircle = function() {
 		fill(this.colour)
 		var posX = (this.maxRadius - this.radius) * cos(this.initialangle)
 		var posY = (this.maxRadius - this.radius) * sin(this.initialangle)
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 	particle.prototype.displayOutwardsCircle = function() {
 		fill(this.colour)
 		var posX = this.radius * cos(this.initialangle)
 		var posY = this.radius * sin(this.initialangle)
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 	particle.prototype.displayRotationClockWise = function() {
 		fill(this.colour)
 		var posX = this.maxRadius*this.initialangle/(2*PI) * cos(2*PI*this.radius/this.maxRadius + 2*PI*frameCount/60)
 		var posY = this.maxRadius*this.initialangle/(2*PI) * sin(2*PI*this.radius/this.maxRadius + 2*PI*frameCount/60)
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 	particle.prototype.displayRotationAntiClockWise = function() {
 		fill(this.colour)
 		var posX = this.maxRadius*this.initialangle/(2*PI) * cos(-2*PI*this.radius/this.maxRadius - 2*PI*frameCount/60)
 		var posY = this.maxRadius*this.initialangle/(2*PI) * sin(-2*PI*this.radius/this.maxRadius - 2*PI*frameCount/60)
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 
@@ -219,28 +223,28 @@ function particle(){
 		fill(this.colour)
 		var posX = -width/2 + this.initialangle*width/(2*PI)
 		var posY = -height/2 + this.radius*height/this.maxRadius
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 	particle.prototype.displayHorizontalUp = function() {
 		fill(this.colour)
 		var posX = -width/2 + this.initialangle*width/(2*PI)
 		var posY = height/2 - this.radius*height/this.maxRadius
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 	particle.prototype.displayVerticalLeft = function() {
 		fill(this.colour)
 		var posY = -height/2 + this.initialangle*height/(2*PI)
 		var posX = width/2 - this.radius*width/this.maxRadius
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 	particle.prototype.displayVerticalRight = function() {
 		fill(this.colour)
 		var posY = -height/2 + this.initialangle*height/(2*PI)
 		var posX = -width/2 + this.radius*width/this.maxRadius
-		ellipse(posX, posY, this.size)
+		this.show(posX, posY)
 	};
 
 
