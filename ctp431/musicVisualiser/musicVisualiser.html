@@ -16,6 +16,19 @@
 
 <div id="canvasContainer"></div>
 
+<div>
+	<button onclick='
+		if(song.isPlaying()){
+			song.pause()
+			pause = true
+			this.innerHTML = "Resume"
+		} else{
+			song.play()
+			pause = false
+			this.innerHTML = "Pause"
+		}'>Pause</button>
+</div>
+
 <footer>
 	<p>Music: Cosmorot - Electro Swing [Royalty Free ElectroSwing]</p>
 	<p>Inspiration: https://p5js.org/examples/simulate-snowflakes.html</p>
