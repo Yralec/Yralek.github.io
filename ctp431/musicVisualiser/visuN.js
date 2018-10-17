@@ -38,13 +38,14 @@ var power = 0
 var oldPower = 0
 
 function draw() {
+	alphaVal = 0.2 + sin(frameCount*2*PI/(3.4*60))*0.2
 	if (!pause) {
 
 		var rms = amp.getLevel()
 		var db = 20.0*Math.log10(rms);
 		power = 70 + db
 
-		background('rgba(0,0,0,'+alphaVal+')')
+		background('rgba('+0+','+0+','+0+','+alphaVal+')')
 
 		particles()
 		if(power - oldPower > 0.1){
