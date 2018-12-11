@@ -304,3 +304,61 @@ function playRightRing(){
 	currentMelodyFinger = 2
 	console.log(3)
 }
+
+
+
+
+
+
+function playRight(x,y,z, f){
+	if(currentMelodyFinger == 0){
+		currentMelodyNote+=x
+		keyDown(melodyToNote(currentMelodyNote), volRight)
+	} else if(currentMelodyFinger == 1){
+		currentMelodyNote+=y
+		keyDown(melodyToNote(currentMelodyNote), volRight)
+	} else{
+		currentMelodyNote+=z
+		keyDown(melodyToNote(currentMelodyNote), volRight)
+	}
+	currentMelodyFinger = f
+}
+
+
+
+
+
+if(!rightDown[0] && d1 < noteOnDistance ){
+		playRight(-1,-1,-3, 0)
+		rightDown[0] = true
+	} else if(rightDown[0] && d1 > noteOffDistance){
+		rightDown[0] = false
+	}
+	if(!rightDown[1] && d2 < noteOnDistance){
+		playRight(+1,0,-1, 1)
+		rightDown[1] = true
+	} else if(rightDown[1] && d2 > noteOffDistance){
+		rightDown[1] = false
+	}
+	if(!rightDown[2] && d3 < noteOnDistance){
+		playRight(3,1,1, 2)
+		rightDown[2] = true
+	} else if(rightDown[2] && d3 > noteOffDistance){
+		rightDown[2] = false
+	}
+
+
+
+
+	/*if(!leftDown[1] && d2 < noteOnDistance){
+		playLeft(chord, 1)
+		leftDown[1] = true
+	} else if(leftDown[1] && d2 > noteOffDistance){
+		leftDown[1] = false
+	}
+	if(!leftDown[2] && d3 < noteOnDistance){
+		playLeft(chord, 2)
+		leftDown[2] = true
+	} else if(leftDown[2] && d3 > noteOffDistance){
+		leftDown[2] = false
+	}*/

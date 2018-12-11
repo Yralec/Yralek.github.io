@@ -2,6 +2,7 @@ var notes = []
 var leftLineGeometries = []
 var rightLineGeometries = []
 var limits = [-0.15, 0.15]
+var limitsY = [0.1, 0.2]
 var leftDown = [false, false, false]
 var rightDown = [false, false, false]
 var noteOnDistance = 0.02
@@ -10,9 +11,17 @@ var currentMelodyNote = 0
 var currentMelodyFinger = 0 //0 index, 1 middle, 2 ring
 var info = document.getElementById('info')
 var melody = [1,2,3,6,7,9,10]
+var melody2 = [0,2,4,5,8,9,11]
+var chordMelody = [[-3,-1,0,2,4],[-5,-3,-1,0,2],[-7,-5,-3,-1,0],[-8,-7,-4,-3,-1]]
+var currentChord = 0
+var chords2 = [[-3,0,4,0],[-5,-1,2,-1],[-7,-3,0,-3],[-8,-4,-1,-4]]	//['a','G','F','E']
+var volLeftBounds = [0.05,0.2]
+var volLeft = 0.25
+var volRight = 0.5
 // Set up plugins
 
-Leap.loop({
+function setup3D(){
+	Leap.loop({
 		background: true
 	})
 	.use('transform', {
@@ -27,62 +36,63 @@ Leap.loop({
 	})
 	.use('proximity')
 
-Leap.loopController.on('frame', function(frame){
+	Leap.loopController.on('frame', function(frame){
 
-    if (!frame.hands.length > 0) return;
-
-
-    var hands = frame.hands
-    for(var i = 0; i < 1; ++i){
-	    var hand = hands[0]
-	    if(!hand){return}
-		leftHand(hand)
-		var hand = hands[1]
-		if(!hand){return}
-		rightHand(hand)
-	}
-})
-
-// Set up scene
-
-var scene = Leap.loopController.plugins.boneHand.scene;
-var camera = Leap.loopController.plugins.boneHand.camera;
-var renderer = Leap.loopController.plugins.boneHand.renderer;
-camera.position.set(0, 0.3, 0.6);
-
-var controls = new THREE.OrbitControls(camera);
-var axisHelper = new THREE.AxisHelper(0.1);
-scene.add(axisHelper);
+	    if (!frame.hands.length > 0) return;
 
 
-var base = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), new THREE.MeshPhongMaterial({
-	color: 0x222222
-}));
-base.position.set(0, 0, 0);
-base.rotateX(Math.PI * -0.5);
+	    var hands = frame.hands
+	    for(var i = 0; i < 1; ++i){
+		    var hand = hands[0]
+		    if(!hand){return}
+			leftHand(hand)
+			var hand = hands[1]
+			if(!hand){return}
+			rightHand(hand)
+		}
+	})
 
-scene.add(base);
+	// Set up scene
+
+	var scene = Leap.loopController.plugins.boneHand.scene;
+	var camera = Leap.loopController.plugins.boneHand.camera;
+	var renderer = Leap.loopController.plugins.boneHand.renderer;
+	camera.position.set(0, 0.3, 0.6);
+
+	var controls = new THREE.OrbitControls(camera);
+	var axisHelper = new THREE.AxisHelper(0.1);
+	scene.add(axisHelper);
 
 
-function setup(){
+	var base = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), new THREE.MeshPhongMaterial({
+		color: 0x222222
+	}));
+	base.position.set(0, 0, 0);
+	base.rotateX(Math.PI * -0.5);
+
+	scene.add(base);
+
+
 	var board = createColouredScale(scene)
-	for(var i = 0; i < 3; ++i){
-		leftLineGeometries[i] = new THREE.Geometry()
-		leftLineGeometries[i].vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -10 ) );
-		addLine(leftLineGeometries[i])
-		rightLineGeometries[i] = new THREE.Geometry()
-		rightLineGeometries[i].vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -10 ) );
-		addLine(rightLineGeometries[i])
-	}
+		for(var i = 0; i < 3; ++i){
+			leftLineGeometries[i] = new THREE.Geometry()
+			leftLineGeometries[i].vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -10 ) );
+			addLine(leftLineGeometries[i])
+			rightLineGeometries[i] = new THREE.Geometry()
+			rightLineGeometries[i].vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -10 ) );
+			addLine(rightLineGeometries[i])
+		}
 }
+
 
 function createColouredScale(base){
 	var d = limits[1] - limits[0]
-	for(var i = 0; i < 12; ++i){
-		var geometry = new THREE.PlaneGeometry(1 * d/12,0.2,12)
-		var material = new THREE.MeshBasicMaterial({color: new THREE.Color().setHSL(i/12,0.8,0.5), side: THREE.DoubleSide})
+	var max = 4
+	for(var i = 0; i < max; ++i){
+		var geometry = new THREE.PlaneGeometry(1 * d/max,0.2,max)
+		var material = new THREE.MeshBasicMaterial({color: new THREE.Color().setHSL(i/max,0.8,0.5), side: THREE.DoubleSide})
 		var plane = new THREE.Mesh(geometry, material)
-		plane.translateX(limits[0] + d*i/11)
+		plane.translateX(limits[0] + d*i/(max-1))
 		base.add(plane)
 	}
 	return plane
@@ -103,7 +113,19 @@ function positionToMidi(position){
 	return 60 + (position - limits[0])/d * 12
 }
 
-setup()
+function positionToChord(position){
+	var d = (limits[1] - limits[0])
+	if(position < limits[0]){
+		position = limits[0]
+	} else if(position > limits[1]){
+		position = limits[1]
+	}
+	var chord = Math.floor((position - limits[0])/d * 4)
+	if(chord >= 4){
+		chord = 3
+	}
+	return chord
+}
 
 
 
@@ -123,38 +145,38 @@ function leftHand(hand){
 	var d2 = leftLineGeometries[1].vertices[0].distanceTo(leftLineGeometries[1].vertices[1])
 	var d3 = leftLineGeometries[2].vertices[0].distanceTo(leftLineGeometries[2].vertices[1])
 
-	//console.log(thumbTip)
-	//console.log(d1+" "+d2+" "+d3)
-	var midi = positionToMidi(thumbTip.x)
-	info.innerHTML = Tone.Frequency(midi, "midi").toNote()
+	leftThumbY = thumbTip.y
+	var chord = positionToChord(thumbTip.x)
+	currentChord = chord
 	if(!leftDown[0] && d1 < noteOnDistance ){
-		playLeftIndex(midi)
-		leftDown[0] = true
+		leftHandOn(0)
 	} else if(leftDown[0] && d1 > noteOffDistance){
-		leftDown[0] = false
-	}
-	if(!leftDown[1] && d2 < noteOnDistance){
-		playLeftMiddle(midi)
-		leftDown[1] = true
-	} else if(leftDown[1] && d2 > noteOffDistance){
-		leftDown[1] = false
-	}
-	if(!leftDown[2] && d3 < noteOnDistance){
-		playLeftRing(midi)
-		leftDown[2] = true
-	} else if(leftDown[2] && d3 > noteOffDistance){
-		leftDown[2] = false
+		leftHandOff(0)
 	}
 }
 
-function playLeftIndex(midi){
-	keyDown(midi)
+function leftHandOn(f){
+	leftDown[f] = true
+	playLeft(currentChord, f)
 }
-function playLeftMiddle(midi){
-	keyDown(midi+4)
+
+function leftHandOff(f){
+	leftDown[f] = false
 }
-function playLeftRing(midi){
-	keyDown(midi+7)
+
+function playLeft(chord, pos){
+	playChord(chord, pos, 0)
+}
+
+function playChord(chord, finger, pos){
+	keyDown(60+chords2[chord][pos], volLeft)
+	if(leftDown[finger] == true){
+		setTimeout(()=>{
+			if(leftDown[finger] == true){
+				playChord(chord, finger, (pos+1)%4)
+			}
+		}, arpeggioToMs(leftThumbY))
+	}
 }
 
 function rightHand(hand){
@@ -174,49 +196,107 @@ function rightHand(hand){
 	var d3 = rightLineGeometries[2].vertices[0].distanceTo(rightLineGeometries[2].vertices[1])
 
 	if(!rightDown[0] && d1 < noteOnDistance ){
-		playRight(-1,-1,-7, 0)
-		rightDown[0] = true
+		rightHandOn(0)
 	} else if(rightDown[0] && d1 > noteOffDistance){
-		rightDown[0] = false
+		rightHandOff(0)
 	}
 	if(!rightDown[1] && d2 < noteOnDistance){
-		playRight(+1,0,-1, 1)
-		rightDown[1] = true
+		rightHandOn(1)
 	} else if(rightDown[1] && d2 > noteOffDistance){
-		rightDown[1] = false
+		rightHandOff(1)
 	}
 	if(!rightDown[2] && d3 < noteOnDistance){
-		playRight(7,1,1, 2)
-		rightDown[2] = true
+		rightHandOn(2)
 	} else if(rightDown[2] && d3 > noteOffDistance){
-		rightDown[2] = false
+		rightHandOff(2)
 	}
 }
 
-function playRight(x,y,z, f){
-	if(currentMelodyFinger == 0){
-		currentMelodyNote+=x
-		keyDown(melodyToNote(currentMelodyNote))
-	} else if(currentMelodyFinger == 1){
-		currentMelodyNote+=y
-		keyDown(melodyToNote(currentMelodyNote))
-	} else{
-		currentMelodyNote+=z
-		keyDown(melodyToNote(currentMelodyNote))
-	}
+function rightHandOn(f){
+	currentMelodyNote = fingerNoteMapping(currentMelodyFinger, currentMelodyNote, f)
 	currentMelodyFinger = f
+	keyDown(melodyToNote(currentMelodyNote))
+	rightDown[f] = true
+	console.log(currentMelodyNote)
+}
+
+function rightHandOff(f){
+	rightDown[f] = false
 }
 
 function melodyToNote(x){
-	return 60 + 12*Math.floor(x/7) + melody[(x%7+7)%7]
+	console.log("c "+currentChord+", x "+x)
+	return 60 + chordMelody[currentChord][x]//12*Math.floor(x/7) +  (x%7+7)%7]
 }
 
-document.addEventListener('keydown', (e)=>{
-	if(e.key == 'a'){
-		playRight(-1,-1,-7, 0)
-	} else if(e.key == 's'){
-		playRight(1,0,-1, 1)
-	} else if(e.key == 'd'){
-		playRight(7,1,1, 2)
+function arpeggioToMs(y){
+	if( y > limitsY[1]){
+		y = limitsY[1]
+	} else if(y < limitsY[0]){
+		y = limitsY[0]
 	}
-})
+	var ms = Math.round(500 - (y-limitsY[0])* 10 * 400)
+	return ms
+}
+
+
+//p5
+function setup(){
+	createCanvas(720, 400)
+	noStroke();
+	colorMode(HSB, 1, 1, 1)
+	max = 4
+	for(var i = 0; i < max; ++i){
+		fill(color(i/max,0.8,0.5))
+		rect(i*width/max, 0, width/4, height)
+	}
+	return plane
+}
+
+function draw(){
+	var chord = Math.floor(mouseX*4/width)
+	if(chord >= 4){
+		chord = 3
+	} else if(chord < 0){
+		chord = 0
+	}
+	currentChord = chord
+
+	leftThumbY = limitsY[0] + (height - mouseY)/height * (limitsY[1]-limitsY[0])
+}
+
+function mousePressed(){
+
+	fill(color(currentChord/max,0.8,0.8))
+	pressedChord = currentChord
+	rect(currentChord*width/max, 0, width/4, height)
+	leftHandOn(0)
+}
+
+function mouseReleased(){
+	fill(color(pressedChord/max,0.8,0.5))
+	rect(pressedChord*width/max, 0, width/4, height)
+	leftHandOff(0)
+}
+
+function keyPressed(){
+	if(key == 'a'){
+		rightHandOn(0)
+	} else if(key == 's'){
+		rightHandOn(1)
+	} else if(key == 'd'){
+		rightHandOn(2)
+	}
+}
+
+function keyReleased(){
+	if(key == 'a'){
+		rightHandOff(0)
+	} else if(key == 's'){
+		rightHandOff(1)
+	} else if(key == 'd'){
+		rightHandOff(2)
+	}
+}
+
+//setup3D()
