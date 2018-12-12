@@ -1,9 +1,11 @@
 var notes = []
+var usingLeap = false
 var particles = []
 var leftLineGeometries = []
 var rightLineGeometries = []
-var limits = [-0.3, 0]
+var limits = [-0.25, 0.05]
 var limitsY = [0.1, 0.2]
+var limitsY2 = [0.05, 0.25]
 var leftDown = [false, false, false]
 var rightDown = [false, false, false]
 var noteOnDistance = 0.02
@@ -19,6 +21,11 @@ var chords2 = [[-3,0,4,0],[-5,-1,2,-1],[-7,-3,0,-3],[-8,-4,-1,-4]]	//['a','G','F
 var volLeftBounds = [0.05,0.2]
 var volLeft = 0.25
 var volRight = 0.5
+var pressedChord = -1
+var currentScale = 0
+var scaleLimit = 0.18
+var highColour = new THREE.Color(0x99ebff)
+var lowColour = new THREE.Color(0xffb366)
 // Set up plugins
 
 function animate(){
@@ -70,6 +77,7 @@ function setup3D(){
 	// Set up scene
 
 	scene = Leap.loopController.plugins.boneHand.scene;
+	scene.background = lowColour
 	camera = Leap.loopController.plugins.boneHand.camera;
 	renderer = Leap.loopController.plugins.boneHand.renderer;
 	camera.position.set(0, 0.3, 0.6);
@@ -228,6 +236,16 @@ function rightHand(hand){
 	var d2 = rightLineGeometries[1].vertices[0].distanceTo(rightLineGeometries[1].vertices[1])
 	var d3 = rightLineGeometries[2].vertices[0].distanceTo(rightLineGeometries[2].vertices[1])
 
+	var scalePos = hand.thumb.tipPosition[1]
+	var tmpLowColour = lowColour.clone()
+	scene.background = tmpLowColour.lerp(highColour, (Math.min(Math.max(scalePos, scaleLimit-0.03), scaleLimit+0.03)-scaleLimit+0.03)/0.06)
+
+	if(scalePos > scaleLimit){
+		currentScale = 1
+	} else{
+		currentScale = 0
+	}
+
 	if(!rightDown[0] && d1 < noteOnDistance ){
 		rightHandOn(0)
 	} else if(rightDown[0] && d1 > noteOffDistance){
@@ -253,7 +271,6 @@ function addParticle(pos){
 	obj.position.set(pos.x, pos.y, pos.z)
 	scene.add(obj)
 	particles.push(obj)
-	console.log(obj)
 }
 
 function rightHandOn(f){
@@ -272,7 +289,7 @@ function rightHandOff(f){
 }
 
 function melodyToNote(x){
-	return 60 + chordMelody[currentChord][x]//12*Math.floor(x/7) +  (x%7+7)%7]
+	return 60 + 12*currentScale + chordMelody[currentChord][x]//12*Math.floor(x/7) +  (x%7+7)%7]
 }
 
 function arpeggioToMs(y){
@@ -301,6 +318,16 @@ function setup2D(){
 		}
 
 		p.draw = function (){
+			max = 4
+			for(var i = 0; i < max; ++i){
+				var br = 0.5
+				if(pressedChord == i){
+					br = 0.8
+				}
+				p.fill(p.color(0.75-i/max,0.8,br))
+				p.rect(i*p.width/max, 0, p.width/4, p.height)
+			}
+
 			var chord = Math.floor(p.mouseX*4/p.width)
 			if(chord >= 4){
 				chord = 3
@@ -310,29 +337,55 @@ function setup2D(){
 			currentChord = chord
 
 			leftThumbY = limitsY[0] + (p.height - p.mouseY)/p.height * (limitsY[1]-limitsY[0])
+
+			for(var i = 0; i < particles.length; ++i){
+				var pa = particles[i]
+				pa.y -= 2
+				p.fill(p.color(0.08+pa.c/5,0.8,br))
+				p.rect(pa.x +(pa.c-2)*10,pa.y,20,20)
+				if(pa.y > p.height){
+					particles.splice(i, 1)
+				}
+			}
 		}
 
 		p.mousePressed = function (){
-
-			p.fill(p.color(0.75-currentChord/max,0.8,0.8))
 			pressedChord = currentChord
-			p.rect(currentChord*p.width/max, 0, p.width/4, p.height)
 			leftHandOn(0)
 		}
 
 		p.mouseReleased = function (){
-			p.fill(p.color(0.75-pressedChord/max,0.8,0.5))
+			pressedChord = -1
 			p.rect(pressedChord*p.width/max, 0, p.width/4, p.height)
 			leftHandOff(0)
 		}
 
 		p.keyPressed = function (){
 			if(p.key == 'a'){
+				currentScale = 0
 				rightHandOn(0)
+				particles.push({x: p.mouseX, y: p.mouseY, c: currentMelodyNote})
 			} else if(p.key == 's'){
+				currentScale = 0
 				rightHandOn(1)
+				particles.push({x: p.mouseX, y: p.mouseY, c: currentMelodyNote})
 			} else if(p.key == 'd'){
+				currentScale = 0
 				rightHandOn(2)
+				particles.push({x: p.mouseX, y: p.mouseY, c: currentMelodyNote})
+			}
+			if(p.key == 'q'){
+				currentScale = 1
+				rightHandOn(0)
+				particles.push({x: p.mouseX, y: p.mouseY, c: currentMelodyNote})
+			} else if(p.key == 'w'){
+				currentScale = 1
+				rightHandOn(1)
+				particles.push({x: p.mouseX, y: p.mouseY, c: currentMelodyNote})
+			} else if(p.key == 'e'){
+				currentScale = 1
+				rightHandOn(2)
+				particles.push({x: p.mouseX, y: p.mouseY, c: currentMelodyNote})
 			}
 		}
 
