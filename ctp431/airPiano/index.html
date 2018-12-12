@@ -13,10 +13,13 @@
   <script src="mapping.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
 
-
-  <div id='info'>Chord</div>
 </head>
 <body>
+
+<div id="menu">
+    <button onclick="document.getElementById('menu').style.display = 'none'; setup3D()">Leap Motion</button>
+    <button onclick="document.getElementById('menu').style.display = 'none'; setup2D()">Mouse and Keyboard</button>
+</div>
 
 <script src="airPiano.js"></script>
 </body>

@@ -1,7 +1,8 @@
 var notes = []
+var particles = []
 var leftLineGeometries = []
 var rightLineGeometries = []
-var limits = [-0.15, 0.15]
+var limits = [-0.3, 0]
 var limitsY = [0.1, 0.2]
 var leftDown = [false, false, false]
 var rightDown = [false, false, false]
@@ -20,7 +21,21 @@ var volLeft = 0.25
 var volRight = 0.5
 // Set up plugins
 
+function animate(){
+	requestAnimationFrame(animate)
+	for(var i = 0; i < particles.length; ++i){
+		particles[i].position.y -=0.005
+		if(particles[i].position.y <= -0.1){
+			scene.remove(particles[i])
+			particles.splice(i, 1)
+			--i
+		}
+	}
+}
+
 function setup3D(){
+	clock = new THREE.Clock()
+	usingLeap = true
 	Leap.loop({
 		background: true
 	})
@@ -54,26 +69,29 @@ function setup3D(){
 
 	// Set up scene
 
-	var scene = Leap.loopController.plugins.boneHand.scene;
-	var camera = Leap.loopController.plugins.boneHand.camera;
-	var renderer = Leap.loopController.plugins.boneHand.renderer;
+	scene = Leap.loopController.plugins.boneHand.scene;
+	camera = Leap.loopController.plugins.boneHand.camera;
+	renderer = Leap.loopController.plugins.boneHand.renderer;
 	camera.position.set(0, 0.3, 0.6);
 
-	var controls = new THREE.OrbitControls(camera);
-	var axisHelper = new THREE.AxisHelper(0.1);
+	controls = new THREE.OrbitControls(camera);
+	axisHelper = new THREE.AxisHelper(0.1);
 	scene.add(axisHelper);
 
 
-	var base = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), new THREE.MeshPhongMaterial({
-		color: 0x222222
-	}));
+	base = new THREE.Group()
 	base.position.set(0, 0, 0);
 	base.rotateX(Math.PI * -0.5);
 
 	scene.add(base);
 
+	var obj = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.05, 0.1), new THREE.MeshPhongMaterial({
+		color: 0x222222
+	}));
+	obj.position.set(0,-0.1,0)
+	scene.add(obj)
 
-	var board = createColouredScale(scene)
+	board = createColouredScale(scene)
 		for(var i = 0; i < 3; ++i){
 			leftLineGeometries[i] = new THREE.Geometry()
 			leftLineGeometries[i].vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -10 ) );
@@ -82,6 +100,8 @@ function setup3D(){
 			rightLineGeometries[i].vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -10 ) );
 			addLine(rightLineGeometries[i])
 		}
+
+	animate()
 }
 
 
@@ -90,7 +110,7 @@ function createColouredScale(base){
 	var max = 4
 	for(var i = 0; i < max; ++i){
 		var geometry = new THREE.PlaneGeometry(1 * d/max,0.2,max)
-		var material = new THREE.MeshBasicMaterial({color: new THREE.Color().setHSL(i/max,0.8,0.5), side: THREE.DoubleSide})
+		var material = new THREE.MeshBasicMaterial({color: new THREE.Color().setHSL(0.75-i/max,0.8,0.5), side: THREE.DoubleSide})
 		var plane = new THREE.Mesh(geometry, material)
 		plane.translateX(limits[0] + d*i/(max-1))
 		base.add(plane)
@@ -166,14 +186,27 @@ function leftHandOff(f){
 
 function playLeft(chord, pos){
 	playChord(chord, pos, 0)
+	playChord2(chord, pos, 0, 3, true)
+	//playChord2(chord, pos, 0, 1000/3)
+}
+
+function playChord2(chord, finger, pos, delay, bass){
+	keyDown(60+chords2[chord][pos], volLeft, bass)
+	if(leftDown[finger] == true && pos+1 < 3){
+		setTimeout(()=>{
+			if(leftDown[finger] == true){
+				playChord2(chord, finger, (pos+1), delay)
+			}
+		}, delay)
+	}
 }
 
 function playChord(chord, finger, pos){
-	keyDown(60+chords2[chord][pos], volLeft)
-	if(leftDown[finger] == true){
+	keyDown(60+chords2[chord][pos], volLeft, true)
+	if(leftDown[finger] == true && pos+1 < 3){
 		setTimeout(()=>{
 			if(leftDown[finger] == true){
-				playChord(chord, finger, (pos+1)%4)
+				playChord(chord, finger, (pos+1)%3)
 			}
 		}, arpeggioToMs(leftThumbY))
 	}
@@ -212,12 +245,26 @@ function rightHand(hand){
 	}
 }
 
+function addParticle(pos){
+	var col = new THREE.Color().setHSL(currentMelodyNote/5, 0.5, 0.5)
+	var obj = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.01, 0.01), new THREE.MeshPhongMaterial({
+		color: col
+	}));
+	obj.position.set(pos.x, pos.y, pos.z)
+	scene.add(obj)
+	particles.push(obj)
+	console.log(obj)
+}
+
 function rightHandOn(f){
 	currentMelodyNote = fingerNoteMapping(currentMelodyFinger, currentMelodyNote, f)
 	currentMelodyFinger = f
 	keyDown(melodyToNote(currentMelodyNote))
 	rightDown[f] = true
 	console.log(currentMelodyNote)
+	if(usingLeap == true){
+		addParticle(rightLineGeometries[f].vertices[1])
+	}
 }
 
 function rightHandOff(f){
@@ -225,7 +272,6 @@ function rightHandOff(f){
 }
 
 function melodyToNote(x){
-	console.log("c "+currentChord+", x "+x)
 	return 60 + chordMelody[currentChord][x]//12*Math.floor(x/7) +  (x%7+7)%7]
 }
 
@@ -241,62 +287,65 @@ function arpeggioToMs(y){
 
 
 //p5
-function setup(){
-	createCanvas(720, 400)
-	noStroke();
-	colorMode(HSB, 1, 1, 1)
-	max = 4
-	for(var i = 0; i < max; ++i){
-		fill(color(i/max,0.8,0.5))
-		rect(i*width/max, 0, width/4, height)
+function setup2D(){
+	var sketch = function(p){
+		p.setup = function (){
+			p.createCanvas(720, 400)
+			p.noStroke();
+			p.colorMode(p.HSB, 1, 1, 1)
+			max = 4
+			for(var i = 0; i < max; ++i){
+				p.fill(p.color(0.75-i/max,0.8,0.5))
+				p.rect(i*p.width/max, 0, p.width/4, p.height)
+			}
+		}
+
+		p.draw = function (){
+			var chord = Math.floor(p.mouseX*4/p.width)
+			if(chord >= 4){
+				chord = 3
+			} else if(chord < 0){
+				chord = 0
+			}
+			currentChord = chord
+
+			leftThumbY = limitsY[0] + (p.height - p.mouseY)/p.height * (limitsY[1]-limitsY[0])
+		}
+
+		p.mousePressed = function (){
+
+			p.fill(p.color(0.75-currentChord/max,0.8,0.8))
+			pressedChord = currentChord
+			p.rect(currentChord*p.width/max, 0, p.width/4, p.height)
+			leftHandOn(0)
+		}
+
+		p.mouseReleased = function (){
+			p.fill(p.color(0.75-pressedChord/max,0.8,0.5))
+			p.rect(pressedChord*p.width/max, 0, p.width/4, p.height)
+			leftHandOff(0)
+		}
+
+		p.keyPressed = function (){
+			if(p.key == 'a'){
+				rightHandOn(0)
+			} else if(p.key == 's'){
+				rightHandOn(1)
+			} else if(p.key == 'd'){
+				rightHandOn(2)
+			}
+		}
+
+		p.keyReleased = function (){
+			if(p.key == 'a'){
+				rightHandOff(0)
+			} else if(p.key == 's'){
+				rightHandOff(1)
+			} else if(p.key == 'd'){
+				rightHandOff(2)
+			}
+		}
 	}
-	return plane
+
+	var p5Sketch = new p5(sketch)
 }
-
-function draw(){
-	var chord = Math.floor(mouseX*4/width)
-	if(chord >= 4){
-		chord = 3
-	} else if(chord < 0){
-		chord = 0
-	}
-	currentChord = chord
-
-	leftThumbY = limitsY[0] + (height - mouseY)/height * (limitsY[1]-limitsY[0])
-}
-
-function mousePressed(){
-
-	fill(color(currentChord/max,0.8,0.8))
-	pressedChord = currentChord
-	rect(currentChord*width/max, 0, width/4, height)
-	leftHandOn(0)
-}
-
-function mouseReleased(){
-	fill(color(pressedChord/max,0.8,0.5))
-	rect(pressedChord*width/max, 0, width/4, height)
-	leftHandOff(0)
-}
-
-function keyPressed(){
-	if(key == 'a'){
-		rightHandOn(0)
-	} else if(key == 's'){
-		rightHandOn(1)
-	} else if(key == 'd'){
-		rightHandOn(2)
-	}
-}
-
-function keyReleased(){
-	if(key == 'a'){
-		rightHandOff(0)
-	} else if(key == 's'){
-		rightHandOff(1)
-	} else if(key == 'd'){
-		rightHandOff(2)
-	}
-}
-
-//setup3D()
