@@ -17,8 +17,44 @@
 <body>
 
 <div id="menu">
+
+    <h2>airPiano - ctp431 final project 2018</h2>
+
+    <div>
+      <p>Have you ever wanted to wave your hands around to make music? Well here with airPiano you nearly can!</p>
+      <p>This project wants to enable any user to improvise music while having simple to use and intuitive rules.</p>
+    </div>
+
+
+    <h3>Instructions:</h3>
+    <h4>Leap Motion:</h4>
+    <div>
+    <p>To use leapMotion first check that web app are permitted in the general tab of the leap motion control center.</p>
+    <p>Chords: put your left hand first ontop of the leap motion controller so it becomes the chord-playing hand. bring your index to your thumb to play a chord. The chord played is decided by which coloured plane your hand is above. The height of the hand also determines the speed of the arpeggio.</p>
+    <p>Melody: bring your right hand ontop of the leap motion controller after the first hand is displayed. Bring either your index, middle or ring finger to you thumb to produce a note. If the background is blue then higher notes will play, if it is orange then lower notes will play. Change this by moving your melody hand up or down.</p>
+
+    <h4>Keyboard and Mouse:</h4>
+    <p>Chords: click on one of the colours to play a chord. The height of the chord determines the speed of the arpeggio.</p>
+    <p>Melody: press 'a', 's' or 'd' to play lower notes, and 'q', 'w' or 'e' to play higher notes</p>
+
+    <h4>Have fun!</h4>
+    </div>
+
     <button onclick="document.getElementById('menu').style.display = 'none'; setup3D()">Leap Motion</button>
     <button onclick="document.getElementById('menu').style.display = 'none'; setup2D()">Mouse and Keyboard</button>
+
+    <div>
+      <h3>Libraries used:</h3>
+      <ul>
+        <li><a href="https://threejs.org/">THREE.js</a></li>
+        <li><a href="https://threejs.org/docs/#examples/controls/OrbitControls">OrbitControls</a></li>
+        <li><a href="https://github.com/leapmotion/leapjs">LeapJs</a></li>
+        <li><a href="https://developer-archive.leapmotion.com/javascript">LeapJs Plugins</a></li>
+        <li><a href="https://tonejs.github.io/">Tone.js</a></li>
+        <li><a href="https://github.com/nbrosowsky/tonejs-instruments">Tonejs-instruments</a></li>
+        <li><a href="https://p5js.org/">p5.js</a></li>
+      </ul>
+    </div>
 </div>
 
 <script src="airPiano.js"></script>
